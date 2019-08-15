@@ -1,11 +1,12 @@
 import ast
+import optparse
+
+import keras.models
+import numpy as np
+
 from sklearn.preprocessing import LabelEncoder
 from keras.preprocessing import sequence
-import numpy as np
-from keras.models import load_model
-from optparse import OptionParser
 from keras.layers import Average, Input
-from keras.models import Model
 
 
 def toEvaluationFormat(all_doc_ids, all_prediction):
@@ -47,47 +48,70 @@ def load_data(data_path, max_len=200):
     return np.array(data), np.array(label), np.array(ids)
 
 
-def ensemble(models,model_input):
+def ensemble_model(models, model_input):
     outputs = [model(model_input) for model in models]
     y = Average()(outputs)
 
-    model = Model(model_input, y, name='ensemble')
+    model = keras.models.Model(model_input, y, name='ensemble')
 
     return model
 
 
-parser = OptionParser()
-parser.add_option("--inputTSV", help="load saved cache", type=str)
-parser.add_option("--output", help="load saved cache", type=str)
-parser.add_option("--saved_model1", help="load saved cache", type=str)
-parser.add_option("--saved_model2", help="load saved cache", type=str)
-parser.add_option("--saved_model3", help="load saved cache", type=str)
+def load_models(paths):
+    """
+    Load keras models from the paths, returning a list of
+    models.
+    """
 
-options, arguments = parser.parse_args()
+    models = []
 
-max_len = 200
-embed_size = 1024
-seed = 7
+    for i, path in enumerate(paths, start=1):
+        model = keras.models.load_model(path)
+        model.name = "model{}".format(i)
+        models.append(model)
 
-x_data, y_data, doc_id = load_data(options.inputTSV,max_len=max_len)
+    return models
 
-model1 = load_model(options.saved_model1)
-model1.name = 'model1'
-model2 = load_model(options.saved_model2)
-model2.name = 'model2'
-model3 = load_model(options.saved_model3)
-model3.name = 'model3'
 
-models = [model1, model2, model3]
+def create_ensemble_from_files(paths):
+    """
+    Create an ensemble model from the keras models located at
+    `paths`, which is a sequence of pathnames.
+    """
 
-print(models[0].input_shape[1:])
-model_input = Input(shape=models[0].input_shape[1:], dtype='float32')
+    models = load_models(paths)
+    model_input = Input(shape=models[0].input_shape[1:], dtype='float32')
+    return ensemble_model(models, model_input)
 
-ensemble_models = ensemble(models,model_input)
 
-pred = ensemble_models.predict(x_data)
 
-all_pred = toEvaluationFormat(doc_id, pred)
-with open(options.output, 'w') as fo:
-    for item in all_pred:
-        fo.write(item)
+def main():
+    parser = optparse.OptionParser()
+    parser.add_option("--inputTSV", help="load saved cache", type=str)
+    parser.add_option("--output", help="load saved cache", type=str)
+    parser.add_option("--saved_model1", help="load saved cache", type=str)
+    parser.add_option("--saved_model2", help="load saved cache", type=str)
+    parser.add_option("--saved_model3", help="load saved cache", type=str)
+
+    options, arguments = parser.parse_args()
+
+    max_len = 200
+    embed_size = 1024
+    seed = 7
+
+    x_data, y_data, doc_id = load_data(options.inputTSV,max_len=max_len)
+
+    ensemble = create_ensemble_from_files(
+        [options.saved_model1,
+        options.saved_model2,
+        options.saved_model3])
+
+    pred = ensemble.predict(x_data)
+
+    all_pred = toEvaluationFormat(doc_id, pred)
+    with open(options.output, 'w') as fo:
+        for item in all_pred:
+            fo.write(item)
+
+if __name__ == "__main__":
+    main()
