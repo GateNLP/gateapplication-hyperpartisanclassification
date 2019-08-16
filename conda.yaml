@@ -10,5 +10,5 @@ dependencies:
   - tensorflow=1.12.0
   - pip>=19
   - pip:
-    - allennlp
+    - allennlp==0.8
 
