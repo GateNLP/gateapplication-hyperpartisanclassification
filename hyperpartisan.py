@@ -8,6 +8,24 @@ model that is trained to estimate the "hyperpartisan" category
 of a news document.
 """
 
+# This tool requires an extensive Python environment,
+# and various populated directories.
+# It should be possible to create a suitable Python environment
+# using conda and the conda.yaml file:
+#   conda env create --file conda.yaml
+# The conda.yaml file has a default prefix (name) of "hyperpartisan",
+# if you want to use an alternate prefix, add a --prefix argument.
+
+# This tool requires trained models in HDF5 files to be
+# in the "prediction_models" directory.
+# After you have trained models in the saved_models directory
+# (see the README.md for how to train models):
+# Populate the directory, on Unix with a GNU-ish sort:
+#   cp $(ls saved_models/*.hdf5 | sort -r | sed 3q) prediction_models/
+
+# This tool also requires a populated elmo directory.
+# See the README.md
+
 
 # https://docs.python.org/3.5/library/glob.html
 import glob
