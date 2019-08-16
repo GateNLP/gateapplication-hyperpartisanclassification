@@ -51,6 +51,7 @@ with contextlib.redirect_stderr(open(os.devnull, "w")):
     import keras.preprocessing
 
 import numpy
+import spacy
 import sklearn.preprocessing
 
 from Preprocessing import utils
@@ -135,11 +136,35 @@ def apply_ensemble_model(vectors):
     return predicts[0].tolist()[0]
 
 
+def check_prerequisites():
+    """
+    Check for common problems with prequisites.
+    Prints to stderr, any problems that it finds.
+    """
+
+    reports = []
+
+    model_name = "en_core_web_sm"
+
+    try:
+        spacy.load(model_name)
+    except OSError as err:
+        reports.append(("The spaCy model {!r} needs to be downloaded, see README.md".format(model_name), err))
+
+    for report in reports:
+        friendly, exception = report
+        print(exception, file=sys.stderr)
+        print(friendly)
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
     arg = argv[1:]
+
+    if not check_prerequisites():
+        return 4
 
     text = " ".join(arg)
     score = hyperpartisan(text)
