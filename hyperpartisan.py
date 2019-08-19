@@ -140,21 +140,38 @@ def check_prerequisites():
     """
     Check for common problems with prequisites.
     Prints to stderr, any problems that it finds.
+
+    Return True is everything that is check is okay;
+    Return False otherwise (one or more checks failed).
     """
 
     reports = []
 
+    # Check spaCy model
     model_name = "en_core_web_sm"
-
     try:
         spacy.load(model_name)
     except OSError as err:
         reports.append(("The spaCy model {!r} needs to be downloaded, see README.md".format(model_name), err))
 
+
+    # Check ELMo model
+    ELMo_model = "original"
+    try:
+        line2elmo2.create_elmo(ELMo_model, False)
+    except FileNotFoundError as err:
+        reports.append(("The ELMo model needs to be downloaded, see README.md", err))
+
+
+    if not reports:
+        return True
+
     for report in reports:
         friendly, exception = report
         print(exception, file=sys.stderr)
-        print(friendly)
+        print(friendly, file=sys.stderr)
+
+    return False
 
 
 def main(argv=None):
