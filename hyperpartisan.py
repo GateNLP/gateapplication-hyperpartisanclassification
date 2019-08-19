@@ -8,6 +8,24 @@ model that is trained to estimate the "hyperpartisan" category
 of a news document.
 """
 
+# This tool requires an extensive Python environment,
+# and various populated directories.
+# It should be possible to create a suitable Python environment
+# using conda and the conda.yaml file:
+#   conda env create --file conda.yaml
+# The conda.yaml file has a default prefix (name) of "hyperpartisan",
+# if you want to use an alternate prefix, add a --prefix argument.
+
+# This tool requires trained models in HDF5 files to be
+# in the "prediction_models" directory.
+# After you have trained models in the saved_models directory
+# (see the README.md for how to train models):
+# Populate the directory, on Unix with a GNU-ish sort:
+#   cp $(ls saved_models/*.hdf5 | sort -r | sed 3q) prediction_models/
+
+# This tool also requires a populated elmo directory.
+# See the README.md
+
 
 # https://docs.python.org/3.5/library/glob.html
 import glob
@@ -33,8 +51,10 @@ with contextlib.redirect_stderr(open(os.devnull, "w")):
     import keras.preprocessing
 
 import numpy
+import spacy
 import sklearn.preprocessing
 
+from Preprocessing import nlp
 from Preprocessing import utils
 from Preprocessing import xml2line
 from Preprocessing import line2elmo2
@@ -117,11 +137,63 @@ def apply_ensemble_model(vectors):
     return predicts[0].tolist()[0]
 
 
+def check_prerequisites():
+    """
+    Check for common problems with prequisites.
+    Prints to stderr, any problems that it finds.
+
+    Return True is everything that is check is okay;
+    Return False otherwise (one or more checks failed).
+    """
+
+    reports = []
+
+    # Check NLTK stopwords
+    try:
+        nlp.init_stopwords()
+    except LookupError as err:
+        reports.append(("The NLTK stopwords need to be downloaded, see README.md", err))
+
+    # Check spaCy model
+    model_name = "en_core_web_sm"
+    try:
+        spacy.load(model_name)
+    except OSError as err:
+        reports.append(("The spaCy model {!r} needs to be downloaded, see README.md".format(model_name), err))
+
+
+    # Check ELMo model
+    ELMo_model = "original"
+    try:
+        line2elmo2.create_elmo(ELMo_model, False)
+    except FileNotFoundError as err:
+        reports.append(("The ELMo model needs to be downloaded, see README.md", err))
+
+    # Check the trained hyper-partisan models
+    files = glob.glob("prediction_models/*.hdf5")
+    if len(files) == 0:
+        reports.append(("Trained model files need to be in the prediction_models directory, see hyperpartisan.py", ""))
+
+
+    if not reports:
+        return True
+
+    for report in reports:
+        friendly, exception = report
+        print(exception, file=sys.stderr)
+        print(friendly, file=sys.stderr)
+
+    return False
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
     arg = argv[1:]
+
+    if not check_prerequisites():
+        return 4
 
     text = " ".join(arg)
     score = hyperpartisan(text)

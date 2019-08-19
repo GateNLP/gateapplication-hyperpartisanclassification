@@ -1,0 +1,6 @@
+# prediction_models
+
+This directory contains the models, in HDF5 files,
+that are used by the (top-level) `hyperpartisan.py` command line tool
+for an ensembl prediction.
+Conventionally, the "top 3" models from the saved_models directory are used.
