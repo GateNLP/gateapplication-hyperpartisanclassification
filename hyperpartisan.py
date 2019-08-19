@@ -54,6 +54,7 @@ import numpy
 import spacy
 import sklearn.preprocessing
 
+from Preprocessing import nlp
 from Preprocessing import utils
 from Preprocessing import xml2line
 from Preprocessing import line2elmo2
@@ -146,6 +147,12 @@ def check_prerequisites():
     """
 
     reports = []
+
+    # Check NLTK stopwords
+    try:
+        nlp.init_stopwords()
+    except LookupError as err:
+        reports.append(("The NLTK stopwords need to be downloaded, see README.md", err))
 
     # Check spaCy model
     model_name = "en_core_web_sm"
