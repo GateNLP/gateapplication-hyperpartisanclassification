@@ -2,6 +2,7 @@ __pycache__
 /Preprocessing/.idea/
 /work/*.tsv
 /saved_models/*.hdf5
+/prediction_models/*.hdf5
 /elmo
 /data
 *~
