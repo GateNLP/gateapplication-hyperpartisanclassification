@@ -162,6 +162,11 @@ def check_prerequisites():
     except FileNotFoundError as err:
         reports.append(("The ELMo model needs to be downloaded, see README.md", err))
 
+    # Check the trained hyper-partisan models
+    files = glob.glob("prediction_models/*.hdf5")
+    if len(files) == 0:
+        reports.append(("Trained model files need to be in the prediction_models directory, see hyperpartisan.py", ""))
+
 
     if not reports:
         return True
