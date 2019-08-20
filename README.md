@@ -43,8 +43,10 @@ python -m nltk.downloader stopwords
 
 Preparation steps:
 * create a directory `elmo` and store the ELMo model files in that directory:
-  * https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5
-  * https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json
+```
+wget https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5
+wget https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json
+```
 * create a directory `data` and save the by-article training files into it:
   * articles-training-byarticle-20181122.xml
   * ground-truth-training-byarticle-20181122.xml 
@@ -76,3 +78,14 @@ Run the following steps
   * Otherwise: `python Preprocessing/line2elmo2.py -l 100 work/test.text.tsv work/test.elmo.tsv`
 * Run the actual application of the model ensemble
   * `./ensemble_pred.sh work/test.elmo.tsv work/test.preds.txt` 
+
+## GATE Application
+
+The `.xgapp` file can be loaded into [GATE](https://gate.ac.uk/)
+and used as a GATE application.
+It requires a working [`conda`](https://conda.io/en/latest/)
+environment to exist in the `condaenv` subdirectory.
+
+The shell script `prepare-condaenv.sh` can
+populate this directory from the `conda.yaml` file, and
+will download the necessary NLTK data.

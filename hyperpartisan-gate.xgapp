@@ -34,7 +34,7 @@
                 <entry>
                   <string>pythonBinaryUrl</string>
                   <gate.util.persistence.PersistenceManager-URLHolder>
-                    <urlString>$relpath$fresh-hyperpartisan/bin/python</urlString>
+                    <urlString>$relpath$fresh-condaenv/bin/python</urlString>
                   </gate.util.persistence.PersistenceManager-URLHolder>
                 </entry>
                 <entry>
