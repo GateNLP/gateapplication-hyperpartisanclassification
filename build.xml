@@ -1,0 +1,69 @@
+<project name="comrades-pipelines" default="all">
+
+  <!-- Apache Ant buidfile for making a GATE Cloud-ready zip file -->
+
+  <!-- Override any property defaults in the build.properties file -->
+  <property file="build.properties" />
+
+  <!-- Default property values follow -->
+  <property name="gate.home" value="../../../gate" />
+
+  <property name="build.dir" location="../hyperpartisan-build" />
+
+  <!-- The packageApp task uses lots of copy tasks. We exclude some files 
+       based on the typical structure of a CREOLE plugin -->
+  <defaultexcludes add="**/src/**"/>
+  <defaultexcludes add="**/classes/**"/>
+  <defaultexcludes add="**/build.xml"/>
+  <defaultexcludes add="**/.project"/>
+  <defaultexcludes add="**/.eclipse"/>
+  <defaultexcludes add="**/.settings"/>
+  <defaultexcludes add="**/.*-metadata/**"/>
+  
+  <typedef resource="gate/util/ant/antlib.xml">
+    <classpath>
+      <pathelement location="${gate.home}/bin/gate.jar"/>
+      <fileset dir="${gate.home}/lib" includes="**/*.jar" />
+    </classpath>
+  </typedef>
+
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath>
+      <pathelement location="${gate.home}/build/lib/ant-contrib.jar" />
+    </classpath>
+  </taskdef>
+
+  <target name="hyperpartisan">
+    <mkdir dir="${build.dir}/hyperpartisan" />
+    <packagegapp src="./hyperpartisan-gate.xgapp"
+                 destfile="${build.dir}/hyperpartisan/application.xgapp"
+                 gatehome="${gate.home}"
+                 expandIvy="yes"
+                 copyResourceDirs="no"
+                 copyPlugins="yes">
+      <hint from="." to="." />
+      <extraresourcespath>
+        <fileset dir="." includes="elmo/**, prediction_models/** Preprocessing/**, *.py" />
+      </extraresourcespath>
+    </packagegapp>
+
+    <!-- build an initial zip file with Ant <zip>, minus the condaenv -->
+    <zip destfile="${build.dir}/hyperpartisan.zip">
+      <fileset dir="${build.dir}/hyperpartisan">
+        <exclude name="condaenv/**" />
+      </fileset>
+      <zipfileset dir="metadata" prefix="metadata/" />
+    </zip>
+
+    <!-- now add in the condaenv using command line zip to preserve symlinks -->
+    <exec executable="zip" dir="." failonerror="true">
+      <arg value="-ry" />
+      <arg file="${build.dir}/hyperpartisan.zip" />
+      <arg value="condaenv" />
+    </exec>
+
+    <delete dir="${build.dir}/hyperpartisan" />
+  </target>
+
+  <target name="all" depends="hyperpartisan" />
+</project>
