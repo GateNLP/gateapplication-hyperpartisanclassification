@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<metadata xmlns="http://gate.ac.uk/ns/pipeline-metadata">
+  <pipeline-name>Hyperpartisan scorer</pipeline-name>
+  <slug>hyperpartisan</slug>
+  <ordering>80</ordering>
+  <annotation-selectors>:hyperpartisan</annotation-selectors>
+  <additional-annotations></additional-annotations>
+  <tags>
+    <tag>English</tag>
+    <tag>Hyperpartisan</tag>
+    <tag>News</tag>
+  </tags>
+</metadata>
