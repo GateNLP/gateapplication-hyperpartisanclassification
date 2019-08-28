@@ -163,10 +163,12 @@ def check_prerequisites():
 
 
     # Check ELMo model
-    ELMo_model = "original"
-    try:
-        line2elmo2.create_elmo(ELMo_model, False)
-    except FileNotFoundError as err:
+    # A perfect check would be to a try line2elmo2.create_elmo;
+    # a successful run of that take 7 seconds,
+    # so is unsuitable for one-shot processing.
+    elmo_hdf = glob.glob("elmo/*.hdf5")
+    elmo_json = glob.glob("elmo/*.json")
+    if len(elmo_hdf) < 1 or len(elmo_json) < 1:
         reports.append(("The ELMo model needs to be downloaded, see README.md", err))
 
     # Check the trained hyper-partisan models
