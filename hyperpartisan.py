@@ -197,9 +197,15 @@ def main(argv=None):
     if not check_prerequisites():
         return 4
 
-    text = " ".join(arg)
-    score = hyperpartisan(text)
-    print(json.dumps({"hyperpartisan_probability": score}))
+    if arg == ["-"]:
+        source = sys.stdin
+    else:
+        source = [" ".join(arg)]
+
+
+    for text in source:
+        score = hyperpartisan(text)
+        print(json.dumps({"hyperpartisan_probability": score}))
 
 
 if __name__ == "__main__":
