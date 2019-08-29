@@ -132,15 +132,34 @@ def elmo_embedding(article):
     return vectors
 
 
+def make_ensemble_model():
+    """
+    Make an ensemble model, from the files in
+    prediction_models/.
+
+    memoise the result, so that the same model is returned for
+    subsequent calls.
+    """
+
+    model = ensemble_pred.create_ensemble_from_files(
+        sorted(glob.glob("prediction_models/*.hdf5"))
+    )
+
+    def return_ensemble_model_from_cache():
+        return model
+
+    global make_ensemble_model
+    make_ensemble_model = return_ensemble_model_from_cache
+    return make_ensemble_model()
+
+
 def apply_ensemble_model(vectors):
     """
     Given a list of vectors representing an article,
     apply the ensemble model and return a score.
     """
 
-    model = ensemble_pred.create_ensemble_from_files(
-        sorted(glob.glob("prediction_models/*.hdf5"))
-    )
+    model = make_ensemble_model()
 
     padded_vectors = keras.preprocessing.sequence.pad_sequences(
         [vectors], maxlen=200, dtype="float32"
