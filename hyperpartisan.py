@@ -101,6 +101,21 @@ def add_article_sent(article):
     return article
 
 
+def make_elmo():
+    """
+    Create an elmo Embedder and return it;
+    memoise this function, so that it is faster on
+    all subsequent calls.
+    """
+    elmo = line2elmo2.create_elmo("original", False)
+    def return_elmo_from_cache():
+        return elmo
+
+    global make_elmo
+    make_elmo = return_elmo_from_cache
+    return make_elmo()
+
+
 def elmo_embedding(article):
     """
     Convert an article (using the text in its "article_sent" key)
@@ -112,7 +127,7 @@ def elmo_embedding(article):
 
     sents = article["article_sent"].split(" <splt> ")
 
-    elmo = line2elmo2.create_elmo("original", False)
+    elmo = make_elmo()
     vectors = line2elmo2.elmo_one_article(elmo, sents, 200, 200, batchsize=50)
     return vectors
 
