@@ -66,7 +66,8 @@ def load_models(paths):
     models = []
 
     for i, path in enumerate(paths, start=1):
-        model = keras.models.load_model(path)
+        # Note: compile=False improves model load times (by about 3x)
+        model = keras.models.load_model(path, compile=False)
         model.name = "model{}".format(i)
         models.append(model)
 
