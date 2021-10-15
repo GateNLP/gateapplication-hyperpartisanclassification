@@ -17,7 +17,7 @@ def create_pipeline():
     does the usual XML processing.
     """
 
-    return [
+    pipeline = [
         processingresources.PrAddTitle(),
         processingresources.PrAddText(),
         processingresources.PrNlpSpacy01(),
@@ -25,6 +25,11 @@ def create_pipeline():
         processingresources.PrSeqSentences(),
         processingresources.PrRemovePars(),
     ]
+    def return_pipeline_from_cache():
+        return pipeline
+    global create_pipeline
+    create_pipeline = return_pipeline_from_cache
+    return create_pipeline()
 
 
 def main():
