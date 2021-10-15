@@ -19,4 +19,8 @@ def hyper(document, outputAS):
 
 
 if __name__ == "__main__":
+    # Pre-load models
+    hyperpartisan.make_elmo()
+    hyperpartisan.make_ensemble_model()
+
     hyper.start()
