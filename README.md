@@ -89,3 +89,7 @@ environment to exist in the `condaenv` subdirectory.
 The shell script `prepare-condaenv.sh` can
 populate this directory from the `conda.yaml` file, and
 will download the necessary NLTK data.
+
+## ELG Service
+
+The file `hyperpartisan_elg.py` can be used to run a web service compatible with the API specifications of the [European Language Grid (ELG)](https://european-language-grid.readthedocs.io/en/release1.1.2/all/A3_API/LTInternalAPI.html).  In addition to the classifier's own dependencies, this service requires `flask` and `Flask-JSON`, and for production use you should use a production-grade WSGI server such as gunicorn rather than the built in development server of Flask.
